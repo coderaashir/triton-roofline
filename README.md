@@ -32,8 +32,6 @@ predicted time = max(FLOPs / peak FLOP/s,  bytes moved / peak bandwidth)
 % of roofline  = predicted time / measured time
 ```
 
-Hardware specs live in [`hardware.py`](src/troof/hardware.py) as data, so the same model works for any accelerator by adding one entry.
-
 ## Next
 
 - **Fused softmax and RMSNorm:** show how fusing operations cuts memory traffic with byte counts and before/after numbers.
