@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "troof"
+version = "0.1.0"
+description = "Triton kernels measured against a hand-built roofline model"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "torch",
+    # Triton only ships Linux wheels; on macOS you edit code, Colab runs it.
+    "triton; sys_platform == 'linux'",
+    "numpy",
+    "pandas",
+    "matplotlib",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+extend-exclude = ["notebooks"]
