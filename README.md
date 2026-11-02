@@ -1,14 +1,12 @@
 # triton-roofline
 
-Triton GPU kernels, benchmarked and compared against a roofline model I built myself.
+Triton GPU kernels, benchmarked and compared against a roofline model.
 
 ![Triton kernels on the NVIDIA T4 roofline](figures/roofline_elementwise.png)
 
-> **Status:** week 1 of 3 (started Oct 27, 2026). Elementwise kernels are done; fusion and matmul come next.
-
 ## Results so far: elementwise kernels on a T4
 
-Measured at 64M fp32 elements, on a Google Colab T4. Every kernel's output is checked against PyTorch before timing.
+Measured at 64M fp32 elements, on a Google Colab T4 (each kernel's output is checked against PyTorch).
 
 | Kernel | Bytes / element | Triton | PyTorch | % of 320 GB/s spec | % of roofline |
 |---|---|---|---|---|---|
@@ -20,14 +18,14 @@ Raw data: [`results/elementwise.csv`](results/elementwise.csv)
 
 ## What I found
 
-1. **All three kernels are memory-bound.** Their arithmetic intensity (0.08–1.75 FLOPs/byte) is far below the T4's ridge point of 25 FLOPs/byte, so their speed is set by how fast data moves, not by math.
-2. **GELU is as fast as ReLU,** 2.320 ms vs 2.327 ms, even though GELU does far more math per element (it calls `erf`). Both move 8 bytes per element, and the extra math hides behind the memory traffic.
-3. **About 75% of the spec bandwidth is the practical ceiling.** PyTorch's own kernels level off at the same 230–239 GB/s, so my kernels reach the limit the T4 delivers in practice, not the spec-sheet number.
-4. **Small inputs are dominated by launch overhead.** From 1K to 16K elements every kernel takes 4–7 µs regardless of size: at 1K elements that's under 1% of peak bandwidth. Bandwidth only gets close to 70% of spec around 1M elements (8–12 MB).
+1. **All three kernels are memory-bound.** Their arithmetic intensity (0.08–1.75 FLOPs/byte) is far below the T4's ridge point of 25 FLOPs/byte.
+2. **GELU is as fast as ReLU,** 2.320 ms vs 2.327 ms, even though GELU does far more math per element (it calls `erf`).
+3. **About 75% of the spec bandwidth is the practical ceiling.**
+4. **Small inputs are dominated by launch overhead.** From 1K to 16K elements every kernel takes 4–7 µs regardless of size. Bandwidth only gets close to 70% of spec around 1M elements (8–12 MB).
 
 ## How the roofline model works
 
-For each kernel I count the FLOPs and bytes moved by hand. The model predicts a lower bound on time:
+For each kernel I count the FLOPs and bytes moved. The model predicts a lower bound on time:
 
 ```
 predicted time = max(FLOPs / peak FLOP/s,  bytes moved / peak bandwidth)
@@ -38,9 +36,9 @@ Hardware specs live in [`hardware.py`](src/troof/hardware.py) as data, so the sa
 
 ## Next
 
-- **Fused softmax and RMSNorm (by Nov 9):** show how fusing operations cuts memory traffic, with byte counts and before/after numbers.
-- **Tiled matmul with autotuning (by Nov 9):** TFLOP/s vs matrix size, crossing from memory-bound to compute-bound.
-- **Per-kernel cost model (by Nov 16):** every kernel declares its FLOPs and bytes; one table of predicted vs achieved for every kernel and shape.
+- **Fused softmax and RMSNorm:** show how fusing operations cuts memory traffic with byte counts and before/after numbers.
+- **Tiled matmul with autotuning:** TFLOP/s vs matrix size.
+- **Per-kernel cost model:** every kernel declares its FLOPs and bytes; one table of predicted vs achieved for every kernel and shape.
 - **Measure the achievable bandwidth ceiling** directly with a copy kernel.
 
 ## Layout
