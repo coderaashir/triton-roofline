@@ -1,0 +1,52 @@
+Output of scripts/diagnose_matmul.py on a Colab T4 (sm_75), matmul 2048x2048x2048.
+Each tile config is compiled and timed on its own; counts are instructions in the compiled PTX.
+
+float16 128x256x32 w8 s1           0.06 TFLOP/s  regs=64   spills=2832 mma=0 ldmatrix=0 fma=4096 cp.async=0
+float16 128x256x32 w8 s2           0.06 TFLOP/s  regs=64   spills=2832 mma=0 ldmatrix=0 fma=4096 cp.async=0
+float16 128x256x32 w8 s3           0.06 TFLOP/s  regs=64   spills=2832 mma=0 ldmatrix=0 fma=4096 cp.async=0
+float16 128x128x32 w8 s1           0.08 TFLOP/s  regs=64   spills=1034 mma=0 ldmatrix=0 fma=2048 cp.async=0
+float16 128x128x32 w8 s2           0.08 TFLOP/s  regs=64   spills=1034 mma=0 ldmatrix=0 fma=2048 cp.async=0
+float16 128x128x32 w8 s3           0.08 TFLOP/s  regs=64   spills=1034 mma=0 ldmatrix=0 fma=2048 cp.async=0
+float16 128x128x32 w4 s1           0.05 TFLOP/s  regs=64   spills=2876 mma=0 ldmatrix=0 fma=4096 cp.async=0
+float16 128x128x32 w4 s2           0.05 TFLOP/s  regs=64   spills=2876 mma=0 ldmatrix=0 fma=4096 cp.async=0
+float16 128x128x32 w4 s3           0.05 TFLOP/s  regs=64   spills=2876 mma=0 ldmatrix=0 fma=4096 cp.async=0
+float16 128x64x32 w4 s1            0.09 TFLOP/s  regs=64   spills=958  mma=0 ldmatrix=0 fma=2048 cp.async=0
+float16 128x64x32 w4 s2            0.09 TFLOP/s  regs=64   spills=958  mma=0 ldmatrix=0 fma=2048 cp.async=0
+float16 128x64x32 w4 s3            0.09 TFLOP/s  regs=64   spills=958  mma=0 ldmatrix=0 fma=2048 cp.async=0
+float16 64x128x32 w4 s1            0.09 TFLOP/s  regs=64   spills=1000 mma=0 ldmatrix=0 fma=2048 cp.async=0
+float16 64x128x32 w4 s2            0.09 TFLOP/s  regs=64   spills=1000 mma=0 ldmatrix=0 fma=2048 cp.async=0
+float16 64x128x32 w4 s3            0.09 TFLOP/s  regs=64   spills=1000 mma=0 ldmatrix=0 fma=2048 cp.async=0
+float16 64x64x64 w4 s1             0.19 TFLOP/s  regs=64   spills=606  mma=0 ldmatrix=0 fma=2048 cp.async=0
+float16 64x64x64 w4 s2             0.19 TFLOP/s  regs=64   spills=606  mma=0 ldmatrix=0 fma=2048 cp.async=0
+float16 64x64x64 w4 s3             0.19 TFLOP/s  regs=64   spills=606  mma=0 ldmatrix=0 fma=2048 cp.async=0
+float16 64x64x32 w4 s1             1.06 TFLOP/s  regs=255  spills=90   mma=0 ldmatrix=0 fma=1024 cp.async=0
+float16 64x64x32 w4 s2             1.06 TFLOP/s  regs=255  spills=90   mma=0 ldmatrix=0 fma=1024 cp.async=0
+float16 64x64x32 w4 s3             1.06 TFLOP/s  regs=255  spills=90   mma=0 ldmatrix=0 fma=1024 cp.async=0
+float16 32x32x32 w2 s1             2.35 TFLOP/s  regs=202  spills=0    mma=0 ldmatrix=0 fma=512 cp.async=0
+float16 32x32x32 w2 s2             2.38 TFLOP/s  regs=202  spills=0    mma=0 ldmatrix=0 fma=512 cp.async=0
+float16 32x32x32 w2 s3             2.36 TFLOP/s  regs=202  spills=0    mma=0 ldmatrix=0 fma=512 cp.async=0
+
+float32 128x256x32 w8 s1           1.80 TFLOP/s  regs=255  spills=2    mma=0 ldmatrix=0 fma=4096 cp.async=0
+float32 128x256x32 w8 s2           1.80 TFLOP/s  regs=255  spills=2    mma=0 ldmatrix=0 fma=4096 cp.async=0
+float32 128x256x32 w8 s3           2.19 TFLOP/s  regs=255  spills=2    mma=0 ldmatrix=0 fma=4096 cp.async=0
+float32 128x128x32 w8 s1           2.90 TFLOP/s  regs=170  spills=0    mma=0 ldmatrix=0 fma=2048 cp.async=0
+float32 128x128x32 w8 s2           4.24 TFLOP/s  regs=170  spills=0    mma=0 ldmatrix=0 fma=2048 cp.async=0
+float32 128x128x32 w8 s3           4.14 TFLOP/s  regs=170  spills=0    mma=0 ldmatrix=0 fma=2048 cp.async=0
+float32 128x128x32 w4 s1           2.28 TFLOP/s  regs=255  spills=10   mma=0 ldmatrix=0 fma=4096 cp.async=0
+float32 128x128x32 w4 s2           1.78 TFLOP/s  regs=255  spills=10   mma=0 ldmatrix=0 fma=4096 cp.async=0
+float32 128x128x32 w4 s3           1.77 TFLOP/s  regs=255  spills=10   mma=0 ldmatrix=0 fma=4096 cp.async=0
+float32 128x64x32 w4 s1            4.17 TFLOP/s  regs=168  spills=0    mma=0 ldmatrix=0 fma=2048 cp.async=0
+float32 128x64x32 w4 s2            4.06 TFLOP/s  regs=168  spills=0    mma=0 ldmatrix=0 fma=2048 cp.async=0
+float32 128x64x32 w4 s3            3.96 TFLOP/s  regs=168  spills=0    mma=0 ldmatrix=0 fma=2048 cp.async=0
+float32 64x128x32 w4 s1            4.07 TFLOP/s  regs=168  spills=0    mma=0 ldmatrix=0 fma=2048 cp.async=0
+float32 64x128x32 w4 s2            4.08 TFLOP/s  regs=168  spills=0    mma=0 ldmatrix=0 fma=2048 cp.async=0
+float32 64x128x32 w4 s3            4.84 TFLOP/s  regs=168  spills=0    mma=0 ldmatrix=0 fma=2048 cp.async=0
+float32 64x64x64 w4 s1             3.57 TFLOP/s  regs=128  spills=0    mma=0 ldmatrix=0 fma=2048 cp.async=0
+float32 64x64x64 w4 s2             3.58 TFLOP/s  regs=128  spills=0    mma=0 ldmatrix=0 fma=2048 cp.async=0
+float32 64x64x64 w4 s3             3.58 TFLOP/s  regs=128  spills=0    mma=0 ldmatrix=0 fma=2048 cp.async=0
+float32 64x64x32 w4 s1             3.55 TFLOP/s  regs=96   spills=0    mma=0 ldmatrix=0 fma=1024 cp.async=0
+float32 64x64x32 w4 s2             3.55 TFLOP/s  regs=96   spills=0    mma=0 ldmatrix=0 fma=1024 cp.async=0
+float32 64x64x32 w4 s3             3.55 TFLOP/s  regs=96   spills=0    mma=0 ldmatrix=0 fma=1024 cp.async=0
+float32 32x32x32 w2 s1             2.27 TFLOP/s  regs=72   spills=0    mma=0 ldmatrix=0 fma=512 cp.async=0
+float32 32x32x32 w2 s2             2.24 TFLOP/s  regs=72   spills=0    mma=0 ldmatrix=0 fma=512 cp.async=0
+float32 32x32x32 w2 s3             2.24 TFLOP/s  regs=72   spills=0    mma=0 ldmatrix=0 fma=512 cp.async=0
