@@ -59,12 +59,12 @@ def roofline_chart(rows, ceiling):
         RooflineSeries("softmax", [point(sm)], {0: (f"softmax {pct(sm)}", (2.2, 30))}),
         RooflineSeries("rmsnorm", [point(rn)], {0: (f"rmsnorm {pct(rn)}", (1.5, 15))}),
         RooflineSeries("matmul fp32", [point(r) for r in mm32], {
-            len(mm32) - 1: (f"fp32 {mm32[-1].shape.split('x')[0]}³: {pct(mm32[-1])}", (400, 900)),
+            len(mm32) - 1: (f"fp32 {mm32[-1].shape.split('x')[0]}³: {pct(mm32[-1])}", (110, 5600)),
         }, connect=True),
         RooflineSeries("matmul fp16", [point(r) for r in mm16], {
             0: (f"fp16 {mm16[0].shape.split('x')[0]}³", (60, 90)),
-            len(mm16) - 1: (f"fp16 {mm16[-1].shape.split('x')[0]}³: {pct(mm16[-1])}",
-                            (150, 33000)),
+            len(mm16) - 1: (f"fp16 {mm16[-1].shape.split('x')[0]}³: {pct(mm16[-1])}\n(no tensor cores)",
+                            (300, 600)),
         }, connect=True),
     ]
     plot_roofline(hw, series, FIGURES / "roofline.png", measured_bw_gbs=ceiling)
@@ -103,7 +103,7 @@ def fusion_chart(rows, ceiling):
         panels,
         "Row length",
         "Effective bandwidth (GB/s)",
-        refs=[(hw.mem_bw_gbs, "spec"), (ceiling, "copy ceiling")],
+        refs=[(hw.mem_bw_gbs, "spec"), (ceiling, "best measured")],
         figsize=(9, 5),
     )
 
@@ -124,7 +124,7 @@ def matmul_chart(rows):
     plot_lines(
         FIGURES / "matmul.png",
         "Matmul: TFLOP/s vs matrix size (square, N×N×N)",
-        "Solid = fp16 on tensor cores, dashed = fp32. Dotted lines are the T4's peaks.",
+        "Solid = fp16, dashed = fp32. Dotted lines are the T4's peaks.",
         [("", data)],
         "N",
         "TFLOP/s",
@@ -135,9 +135,11 @@ def matmul_chart(rows):
 
 
 def summary(rows, ceiling) -> str:
+    copy_bw = max(r.gbs for r in rows if r.kernel == "copy")
     out = [f"# Results summary ({hw.name})", "",
-           (f"Best measured bandwidth (copy kernel): **{ceiling:.0f} GB/s**, "
-           f"{100 * ceiling / hw.mem_bw_gbs:.0f}% of the {hw.mem_bw_gbs:.0f} GB/s spec."), ""]
+           (f"Best measured bandwidth: **{ceiling:.0f} GB/s**, "
+            f"{100 * ceiling / hw.mem_bw_gbs:.0f}% of the {hw.mem_bw_gbs:.0f} GB/s spec "
+            f"(a plain copy reaches {copy_bw:.0f} GB/s)."), ""]
 
     out += ["## Roofline efficiency per kernel (largest shape)", "",
             ("| Kernel | Shape | Bound | FLOPs/byte | Predicted | Measured | % of roofline "
@@ -182,7 +184,7 @@ def summary(rows, ceiling) -> str:
 def main():
     rows = [r for name in ("elementwise", "softmax", "rmsnorm", "matmul")
             for r in load_csv(RESULTS / f"{name}.csv")]
-    ceiling = max(r.gbs for r in rows if r.kernel == "copy")
+    ceiling = max(r.gbs for r in rows if r.kernel in ("copy", "add", "relu", "gelu"))
     roofline_chart(rows, ceiling)
     elementwise_chart(rows)
     fusion_chart(rows, ceiling)

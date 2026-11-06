@@ -1,6 +1,6 @@
 # Results summary (NVIDIA T4)
 
-Best measured bandwidth (copy kernel): **233 GB/s**, 73% of the 320 GB/s spec.
+Best measured bandwidth: **241 GB/s**, 75% of the 320 GB/s spec (a plain copy reaches 233 GB/s).
 
 ## Roofline efficiency per kernel (largest shape)
 
